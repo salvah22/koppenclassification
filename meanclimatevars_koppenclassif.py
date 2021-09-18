@@ -15,10 +15,13 @@ from datetime import datetime
 from sys import exit
 from osgeo import gdal, osr
 
-def koppen_beck(index):
+
+def koppen_beck(index: range) -> dict:
     """
-    :param index is an iterable in the form of a range with the number of cells in the raster:range
-    ts and pr arrays must be of the form (rows * cols, 12) and be global vars so that they are called without parsing
+    ts and pr global np.array w/ shape == (rows * cols, 12), not an argument to the function
+
+    :param index: range iterable with the number of cells in the raster (rows * cols)
+    :return dict:
     """
     # pre-calculations
     MAT = ts[index].sum() / 12
@@ -151,10 +154,12 @@ def koppen_beck(index):
 
     return koppenDict[koppenClass]
 
-def coffee(index):
+def coffee(index: range) -> dict:
     """
-    :param index is an iterable in the form of a range with the number of cells in the raster:range
-    ts and pr arrays must be of the form (rows * cols, 12) and be global vars so that they are called without parsing
+    ts and pr global np.array w/ shape == (rows * cols, 12), not an argument to the function
+
+    :param index: range iterable with the number of cells in the raster (rows * cols)
+    :return dict:
     """
     MAT = ts[index].sum() / 12
     Tcold = ts[index].min()
@@ -163,12 +168,11 @@ def coffee(index):
     else:
         return 0
 
-def spanMean():
-    pass
-
 scriptStopwatch = datetime.now()
 ############################# USER INPUT #############################
+#path = "/home/salva/proyectos/netCDF4/"
 path = os.path.dirname(__file__)
+#in_netcdf = path + os.sep + "climate_copernicus.nc"
 in_netcdf_ts = os.path.join(path, "ts_Amon_MRI-ESM2-0_historical_r5i1p1f1_gn_185001-201412.nc")
 in_netcdf_pr = os.path.join(path, "pr_Amon_MRI-ESM2-0_historical_r5i1p1f1_gn_185001-201412.nc")
 # CMIP6: "ts": surface temperature, "pr": precipitation
@@ -181,6 +185,7 @@ finish = 151  # finishing year, after the first year (use 0 to go til the end)
 ######################################################################
 ts_netcdf = Dataset(in_netcdf_ts)
 pr_netcdf = Dataset(in_netcdf_pr)
+#variables = list(ts_netcdf.variables.keys())
 rows = ts_netcdf.variables["lat"].size
 cols = ts_netcdf.variables["lon"].size
 frames = ts_netcdf.variables["time"].size
@@ -209,11 +214,15 @@ for y in range(start * 12, finish * 12, 12):
     for m in range(12):
         monthly_ts[m] += ts_array[y + m]
         monthly_pr[m] += pr_array[y + m]
+#monthly_ts = numpy.around((monthly_ts.reshape(12, -1) / year_span) - 273.15, 2)  # 0 Kelvin = -273.15 Celcius
+#monthly_pr = numpy.around((monthly_pr.reshape(12, -1) / year_span) * 86400 * 30, 2)  # 1 kg m-2 s-1 = 86400 · 30 mm month-1
 ts = (monthly_ts.reshape(12, -1).T / year_span) - 273.15  # 0 Kelvin = -273.15 Celcius
 pr = (monthly_pr.reshape(12, -1).T / year_span) * 86400 * 30  # 1 kg m-2 s-1 = 86400 · 30 mm month-1
 print("Means done! Preparing the rasters...")
 
 ### CLASSES & NC FILE INDEX FIX LOOP
+#y = lambda x: x[0:3]
+#y(monthly_ts[0])
 raster_classes = map(koppen_beck, range(rows * cols))
 raster_array = numpy.zeros((rows, cols))
 row = 0
