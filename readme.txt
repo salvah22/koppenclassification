@@ -1,0 +1,1 @@
+everything that I actually used in the project (jan 2021) is under v1, it was ~ok, but damn slow (from 45 min to 2.33 hours for just running means.py on multithreading) and required ArcPy (ArcGIS propietary module)... so I decided (sep 2021) to develop something faster and open source, that would be v2, everything that is in this exact folder.
