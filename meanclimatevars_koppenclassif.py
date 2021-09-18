@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-May 10th, 2021. PyCharm Editor.
-Script for NGEN08 Time Series Project.
-
-The script extract from an NC file the yearly mean of the given variable, and create a tif with as many bands as years,
-To use this script just assign the path, (to the) NC file, the nc file name and a variable (var) to mean.
+September 17th, 2021. PyCharm Editor.
+Script for NGEA12 project, Coffee.
+The script averages NC files ts and pr data in a given X span, using a per month basis for later utilization in the koppen classification.
+NC files (in_netcdf_ts & in_netcdf_pr) must match in institution, experiment, variant, table and resolution.
+To use this script just assign NC files name strings, place them in the same folder as the script, change the yearSpan, starting year and finishing year integers, in a way it works for the correct span.
 """
 
 import os
@@ -16,6 +16,10 @@ from sys import exit
 from osgeo import gdal, osr
 
 def koppen_beck(index):
+    """
+    :param index is an iterable in the form of a range with the number of cells in the raster:range
+    ts and pr arrays must be of the form (rows * cols, 12) and be global vars so that they are called without parsing
+    """
     # pre-calculations
     MAT = ts[index].sum() / 12
     MAP = pr[index].sum()
@@ -149,6 +153,8 @@ def koppen_beck(index):
 
 def coffee(index):
     """
+    :param index is an iterable in the form of a range with the number of cells in the raster:range
+    ts and pr arrays must be of the form (rows * cols, 12) and be global vars so that they are called without parsing
     """
     MAT = ts[index].sum() / 12
     Tcold = ts[index].min()
@@ -162,9 +168,7 @@ def spanMean():
 
 scriptStopwatch = datetime.now()
 ############################# USER INPUT #############################
-path = "/home/salva/proyectos/netCDF4/"
 path = os.path.dirname(__file__)
-#in_netcdf = path + os.sep + "climate_copernicus.nc"
 in_netcdf_ts = os.path.join(path, "ts_Amon_MRI-ESM2-0_historical_r5i1p1f1_gn_185001-201412.nc")
 in_netcdf_pr = os.path.join(path, "pr_Amon_MRI-ESM2-0_historical_r5i1p1f1_gn_185001-201412.nc")
 # CMIP6: "ts": surface temperature, "pr": precipitation
@@ -177,7 +181,6 @@ finish = 151  # finishing year, after the first year (use 0 to go til the end)
 ######################################################################
 ts_netcdf = Dataset(in_netcdf_ts)
 pr_netcdf = Dataset(in_netcdf_pr)
-#variables = list(ts_netcdf.variables.keys())
 rows = ts_netcdf.variables["lat"].size
 cols = ts_netcdf.variables["lon"].size
 frames = ts_netcdf.variables["time"].size
@@ -206,15 +209,11 @@ for y in range(start * 12, finish * 12, 12):
     for m in range(12):
         monthly_ts[m] += ts_array[y + m]
         monthly_pr[m] += pr_array[y + m]
-#monthly_ts = numpy.around((monthly_ts.reshape(12, -1) / year_span) - 273.15, 2)  # 0 Kelvin = -273.15 Celcius
-#monthly_pr = numpy.around((monthly_pr.reshape(12, -1) / year_span) * 86400 * 30, 2)  # 1 kg m-2 s-1 = 86400 · 30 mm month-1
 ts = (monthly_ts.reshape(12, -1).T / year_span) - 273.15  # 0 Kelvin = -273.15 Celcius
 pr = (monthly_pr.reshape(12, -1).T / year_span) * 86400 * 30  # 1 kg m-2 s-1 = 86400 · 30 mm month-1
 print("Means done! Preparing the rasters...")
 
 ### CLASSES & NC FILE INDEX FIX LOOP
-#y = lambda x: x[0:3]
-#y(monthly_ts[0])
 raster_classes = map(koppen_beck, range(rows * cols))
 raster_array = numpy.zeros((rows, cols))
 row = 0
@@ -243,6 +242,3 @@ srs.ImportFromEPSG(int('4326'))
 ds.SetProjection(srs.ExportToWkt())
 ds = None
 print("Script took: {} to complete".format(datetime.now() - scriptStopwatch))
-print()
-
-
