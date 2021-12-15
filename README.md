@@ -1,4 +1,4 @@
-# Koppen-geiger Classification Project for NGEA12 course (Lund's University Geomatics Master's Programme)
+# Koppen-geiger Classification Project
 
 The aim and goal of this project was to make a worldwide Koppen-Geiger classification, based on climate normal means for given timespans 1971-2000 and 2091-2100, for comparing and assessing changes in climate zones around the globe. A secondary goal was to create coffee zones 
 
