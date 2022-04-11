@@ -3,12 +3,12 @@
 from PyQt5.QtGui import *
 from qgis.core import *
 
-# Now load the layer and apply styling
+# load the layer and apply styling
 prj = QgsProject.instance()
 layer = prj.mapLayersByName('Amon_CNRM_CM6_1_HR_ssp585_r1i1p1f2_gr_201501_21001_koppen') # por algun motivo no le gustan nombres con guiones
 qCRS = QgsColorRampShader()
 
-# Build the colour ramp using random colours
+# colors containing dictionary
 diction = {"Af": QColor(150, 0, 0, 255),
            "Am": QColor(255, 0, 0, 255),
            "Aw": QColor(255, 204, 204, 255),
@@ -41,6 +41,7 @@ diction = {"Af": QColor(150, 0, 0, 255),
            "EF": QColor(100, 150, 255, 255)
            }
 
+# build a list with ColorRampShader
 l1 = [QgsColorRampShader.ColorRampItem(i+1,diction[val],val) for i, val in enumerate(diction)]
 
 qCRS.setColorRampItemList(l1)
