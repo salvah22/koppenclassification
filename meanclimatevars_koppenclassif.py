@@ -173,7 +173,9 @@ scriptStopwatch = datetime.now()
 #path = "/home/salva/proyectos/netCDF4/"
 path = os.path.dirname(__file__)
 #in_netcdf = path + os.sep + "climate_copernicus.nc"
+# https://data.ceda.ac.uk/badc/cmip6/data/CMIP6/CMIP/MRI/MRI-ESM2-0/historical/r5i1p1f1/Amon/ts/gn/files/d20190222
 in_netcdf_ts = os.path.join(path, "ts_Amon_MRI-ESM2-0_historical_r5i1p1f1_gn_185001-201412.nc")
+# https://data.ceda.ac.uk/badc/cmip6/data/CMIP6/CMIP/MRI/MRI-ESM2-0/historical/r5i1p1f1/Amon/pr/gn/files/d20190222
 in_netcdf_pr = os.path.join(path, "pr_Amon_MRI-ESM2-0_historical_r5i1p1f1_gn_185001-201412.nc")
 # CMIP6: "ts": surface temperature, "pr": precipitation
 # copernicus: "tp" for total precipitation, "swvl1" for soil water content, "t2m" for 2 metre temperature
